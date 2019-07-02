@@ -189,7 +189,7 @@ class ProjectInformation(object):
   @property
   def package_name(self):
     """The package name."""
-    return "{0:s}-python".format(self.library_name)
+    return "{0:s}-python-ratom".format(self.library_name)
 
   @property
   def package_description(self):
@@ -311,7 +311,7 @@ setup(
     url=project_information.project_url,
     version=project_information.library_version,
     description=project_information.package_description,
-    long_description=project_information.package_description,
+    long_description="Built from https://github.com/libratom/libpff for the RATOM project",
     author="Joachim Metz",
     author_email="joachim.metz@gmail.com",
     license="GNU Lesser General Public License v3 or later (LGPLv3+)",
