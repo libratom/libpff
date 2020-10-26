@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #endif
 
+#include "libpff_attachment.h"
 #include "pypff_attachment.h"
 #include "pypff_error.h"
 #include "pypff_integer.h"
