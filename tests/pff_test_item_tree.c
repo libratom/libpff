@@ -1,7 +1,7 @@
 /*
  * Library item_tree type test program
  *
- * Copyright (C) 2008-2020, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2022, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -327,6 +327,7 @@ int pff_test_item_tree_get_tree_node_by_identifier(
 	          NULL,
 	          0,
 	          &result_item_tree_node,
+	          0,
 	          &error );
 
 	PFF_TEST_ASSERT_EQUAL_INT(
@@ -345,6 +346,7 @@ int pff_test_item_tree_get_tree_node_by_identifier(
 	          item_tree_node,
 	          0,
 	          NULL,
+	          0,
 	          &error );
 
 	PFF_TEST_ASSERT_EQUAL_INT(
@@ -441,8 +443,8 @@ int pff_test_item_tree_create_node(
 	libcdata_tree_node_t *root_folder_item_tree_node = NULL;
 	libcerror_error_t *error                         = NULL;
 	libfcache_cache_t *index_tree_cache              = NULL;
-	libfdata_tree_t *descriptor_index_tree           = NULL;
 	libfdata_tree_node_t *descriptor_index_tree_node = NULL;
+	libpff_index_tree_t *descriptor_index_tree       = NULL;
 	int result                                       = 0;
 
 	/* Test error cases
@@ -536,7 +538,11 @@ int main(
 
 	return( EXIT_SUCCESS );
 
+#if defined( __GNUC__ ) && !defined( LIBPFF_DLL_IMPORT )
+
 on_error:
 	return( EXIT_FAILURE );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBPFF_DLL_IMPORT ) */
 }
 

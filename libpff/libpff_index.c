@@ -1,7 +1,7 @@
 /*
  * Index functions
  *
- * Copyright (C) 2008-2020, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2022, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -242,15 +242,15 @@ int libpff_index_read_node(
      libcerror_error_t **error )
 {
 	libpff_index_node_t *index_node      = NULL;
-	static char *function                = "libpff_index_read_node";
 	uint8_t *node_entry_data             = NULL;
+	static char *function                = "libpff_index_read_node";
 	off64_t element_data_offset          = 0;
-	off64_t index_value_file_offset      = 0;
 	off64_t node_data_offset             = 0;
-	uint64_t index_value_identifier      = 0;
 	uint64_t index_value_data_identifier = 0;
-	uint16_t index_value_data_size       = 0;
+	uint64_t index_value_file_offset     = 0;
+	uint64_t index_value_identifier      = 0;
 	uint16_t entry_index                 = 0;
+	uint16_t index_value_data_size       = 0;
 	int sub_node_index                   = 0;
 
 	if( index == NULL )
@@ -497,7 +497,8 @@ int libpff_index_read_node(
 					}
 					/* Ignore offset index values without a file offset and data size
 					 */
-					if( ( index_value_file_offset <= 0 )
+					if( ( index_value_file_offset == 0 )
+					 || ( index_value_file_offset > (uint64_t) INT64_MAX )
 					 || ( index_value_data_size == 0 ) )
 					{
 						continue;
@@ -568,7 +569,8 @@ int libpff_index_read_node_entry(
 	uint8_t *node_entry_data        = NULL;
 	static char *function           = "libpff_index_read_node_entry";
 	off64_t element_data_offset     = 0;
-	off64_t sub_nodes_offset        = 0;
+	uint64_t safe_file_offset       = 0;
+	uint64_t sub_nodes_offset       = 0;
 	int result                      = 0;
 
 	if( index == NULL )
@@ -746,7 +748,7 @@ int libpff_index_read_node_entry(
 			{
 				byte_stream_copy_to_uint32_little_endian(
 				 ( (pff_index_node_offset_entry_32bit_t *) node_entry_data )->file_offset,
-				 index_value->file_offset );
+				 safe_file_offset );
 				byte_stream_copy_to_uint16_little_endian(
 				 ( (pff_index_node_offset_entry_32bit_t *) node_entry_data )->data_size,
 				 index_value->data_size );
@@ -759,7 +761,7 @@ int libpff_index_read_node_entry(
 			{
 				byte_stream_copy_to_uint64_little_endian(
 				 ( (pff_index_node_offset_entry_64bit_t *) node_entry_data )->file_offset,
-				 index_value->file_offset );
+				 safe_file_offset );
 				byte_stream_copy_to_uint16_little_endian(
 				 ( (pff_index_node_offset_entry_64bit_t *) node_entry_data )->data_size,
 				 index_value->data_size );
@@ -767,6 +769,19 @@ int libpff_index_read_node_entry(
 				 ( (pff_index_node_offset_entry_64bit_t *) node_entry_data )->reference_count,
 				 index_value->reference_count );
 			}
+			if( safe_file_offset > (uint64_t) INT64_MAX )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid node entry: %" PRIu16 " offset value out of bounds.",
+				 function,
+				 entry_index );
+
+				return( -1 );
+			}
+			index_value->file_offset = (off64_t) safe_file_offset;
 		}
 		if( libfdata_tree_node_set_leaf(
 		     index_tree_node,
@@ -820,10 +835,21 @@ int libpff_index_read_node_entry(
 		}
 		else if( result == 0 )
 		{
+			if( sub_nodes_offset > (uint64_t) INT64_MAX )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid sub nodes offset value out of bounds.",
+				 function );
+
+				return( -1 );
+			}
 			if( libfdata_tree_node_set_sub_nodes_data_range(
 			     index_tree_node,
 			     0,
-			     sub_nodes_offset,
+			     (off64_t) sub_nodes_offset,
 			     0,
 			     0,
 			     error ) != 1 )

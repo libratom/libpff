@@ -1,7 +1,7 @@
 /*
  * Item tree functions
  *
- * Copyright (C) 2008-2020, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2022, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -206,6 +206,7 @@ int libpff_item_tree_get_tree_node_by_identifier(
      libcdata_tree_node_t *item_tree_node,
      uint32_t item_identifier,
      libcdata_tree_node_t **result_item_tree_node,
+     int recursion_depth,
      libcerror_error_t **error )
 {
 	libcdata_tree_node_t *sub_tree_node       = NULL;
@@ -222,6 +223,18 @@ int libpff_item_tree_get_tree_node_by_identifier(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid item tree node.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( recursion_depth < 0 )
+	 || ( recursion_depth > LIBPFF_MAXIMUM_ITEM_TREE_RECURSION_DEPTH ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid recursion depth value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -330,6 +343,7 @@ int libpff_item_tree_get_tree_node_by_identifier(
 			          sub_tree_node,
 			          item_identifier,
 			          result_item_tree_node,
+			          recursion_depth + 1,
 			          error );
 
 			if( result == -1 )
@@ -646,7 +660,7 @@ int libpff_item_tree_create(
 
 		return( -1 );
 	}
-	if( libfdata_tree_get_root_node(
+	if( libpff_index_tree_get_root_node(
 	     descriptors_index->index_tree,
 	     &descriptor_index_tree_root_node,
 	     error ) != 1 )
@@ -756,7 +770,7 @@ on_error:
 int libpff_item_tree_create_node(
      libpff_item_tree_t *item_tree,
      libbfio_handle_t *file_io_handle,
-     libfdata_tree_t *descriptor_index_tree,
+     libpff_index_tree_t *descriptor_index_tree,
      libfdata_tree_node_t *descriptor_index_tree_node,
      libfcache_cache_t *index_tree_cache,
      libcdata_list_t *orphan_node_list,
@@ -788,6 +802,18 @@ int libpff_item_tree_create_node(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid root folder item tree node.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( recursion_depth < 0 )
+	 || ( recursion_depth > LIBPFF_MAXIMUM_ITEM_TREE_RECURSION_DEPTH ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid recursion depth value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -835,9 +861,8 @@ int libpff_item_tree_create_node(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine if descriptor index tree sub node: %d is deleted.",
-		 function,
-		 sub_node_index );
+		 "%s: unable to determine if descriptor index tree node is deleted.",
+		 function );
 
 		goto on_error;
 	}
@@ -858,9 +883,8 @@ int libpff_item_tree_create_node(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine if descriptor index tree sub node: %d is a leaf node.",
-		 function,
-		 sub_node_index );
+		 "%s: unable to determine if descriptor index tree node is a leaf node.",
+		 function );
 
 		goto on_error;
 	}
@@ -882,8 +906,7 @@ int libpff_item_tree_create_node(
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create index tree from descriptor index tree leaf node.",
-			 function,
-			 sub_node_index );
+			 function );
 
 			goto on_error;
 		}
@@ -958,7 +981,7 @@ on_error:
 int libpff_item_tree_create_leaf_node(
      libpff_item_tree_t *item_tree,
      libbfio_handle_t *file_io_handle,
-     libfdata_tree_t *descriptor_index_tree,
+     libpff_index_tree_t *descriptor_index_tree,
      libfdata_tree_node_t *descriptor_index_tree_node,
      libfcache_cache_t *index_tree_cache,
      libcdata_list_t *orphan_node_list,
@@ -1000,7 +1023,7 @@ int libpff_item_tree_create_leaf_node(
 		return( -1 );
 	}
 	if( ( recursion_depth < 0 )
-	 || ( recursion_depth > 256 ) )
+	 || ( recursion_depth > LIBPFF_MAXIMUM_ITEM_TREE_RECURSION_DEPTH ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -1153,6 +1176,7 @@ int libpff_item_tree_create_leaf_node(
 			  item_tree->root_node,
 			  parent_identifier,
 			  &parent_node,
+			  0,
 			  error );
 
 		if( result == 0 )
@@ -1216,6 +1240,7 @@ int libpff_item_tree_create_leaf_node(
 					  item_tree->root_node,
 					  parent_identifier,
 					  &parent_node,
+					  0,
 					  error );
 			}
 		}
@@ -1381,6 +1406,7 @@ int libpff_item_tree_get_node_by_identifier(
 	          item_tree->root_node,
 	          item_identifier,
                   item_tree_node,
+                  0,
 	          error );
 
 	if( result == -1 )

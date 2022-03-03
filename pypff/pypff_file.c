@@ -1,7 +1,7 @@
 /*
  * Python object wrapper of libpff_file_t
  *
- * Copyright (C) 2008-2020, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2022, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -328,7 +328,7 @@ PyTypeObject pypff_file_type_object = {
 	0
 };
 
-/* Intializes a file object
+/* Initializes a file object
  * Returns 0 if successful or -1 on error
  */
 int pypff_file_init(
@@ -406,6 +406,15 @@ void pypff_file_free(
 		 function );
 
 		return;
+	}
+	if( pypff_file->file_io_handle != NULL )
+	{
+		if( pypff_file_close(
+		     pypff_file,
+		     NULL ) == NULL )
+		{
+			return;
+		}
 	}
 	if( pypff_file->file != NULL )
 	{

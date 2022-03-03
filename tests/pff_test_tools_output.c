@@ -1,7 +1,7 @@
 /*
  * Tools output functions test program
  *
- * Copyright (C) 2008-2020, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2022, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -39,7 +39,7 @@
 
 #include "../pfftools/pfftools_output.h"
 
-/* Tests the pfftools_output_initialize and function
+/* Tests the pfftools_output_initialize function
  * Returns 1 if successful or 0 if not
  */
 int pff_test_tools_output_initialize(

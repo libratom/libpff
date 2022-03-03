@@ -1,7 +1,7 @@
 /*
  * The internal extern definition
  *
- * Copyright (C) 2008-2020, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2022, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -30,7 +30,11 @@
 
 #include <libpff/extern.h>
 
+#if defined( __CYGWIN__ ) || defined( __MINGW32__ )
+#define LIBPFF_EXTERN_VARIABLE	extern
+#else
 #define LIBPFF_EXTERN_VARIABLE	LIBPFF_EXTERN
+#endif
 
 #else
 #define LIBPFF_EXTERN		/* extern */

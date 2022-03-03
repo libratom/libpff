@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="pff_test_io_handle2"
-	ProjectGUID="{33BE3FC3-3C3F-4EB2-9577-B470C8AED4B6}"
-	RootNamespace="pff_test_io_handle2"
+	Name="pff_test_free_map"
+	ProjectGUID="{AECA1696-EAB6-4DFE-AF06-0C3A91EDAEB9}"
+	RootNamespace="pff_test_free_map"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,7 +176,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\pff_test_io_handle2.c"
+				RelativePath="..\..\tests\pff_test_free_map.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\pff_test_functions.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\pff_test_memory.c"
 				>
 			</File>
 		</Filter>
@@ -186,15 +194,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\tests\pff_test_functions.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\pff_test_libbfio.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\pff_test_libcdata.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\tests\pff_test_libcerror.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\pff_test_libfcache.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\pff_test_libfdata.h"
 				>
 			</File>
 			<File
@@ -203,6 +215,10 @@
 			</File>
 			<File
 				RelativePath="..\..\tests\pff_test_macros.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\pff_test_memory.h"
 				>
 			</File>
 			<File

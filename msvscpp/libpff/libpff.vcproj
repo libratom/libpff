@@ -266,10 +266,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libpff\libpff_io_handle2.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libpff\libpff_item.c"
 				>
 			</File>
@@ -355,6 +351,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libpff\libpff_table_block_index.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libpff\libpff_table_header.c"
 				>
 			</File>
 			<File
@@ -473,10 +473,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libpff\libpff_io_handle.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libpff\libpff_io_handle2.h"
 				>
 			</File>
 			<File
@@ -617,6 +613,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libpff\libpff_table_block_index.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libpff\libpff_table_header.h"
 				>
 			</File>
 			<File

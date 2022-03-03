@@ -1,7 +1,7 @@
 /*
  * Python object definition of the sequence and iterator object of record sets
  *
- * Copyright (C) 2008-2020, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2022, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -224,7 +224,7 @@ on_error:
 	return( NULL );
 }
 
-/* Intializes a record sets object
+/* Initializes a record sets object
  * Returns 0 if successful or -1 on error
  */
 int pypff_record_sets_init(

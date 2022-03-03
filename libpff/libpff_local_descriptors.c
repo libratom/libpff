@@ -1,7 +1,7 @@
 /*
  * Local descriptors functions
  *
- * Copyright (C) 2008-2020, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2022, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -279,9 +279,9 @@ int libpff_local_descriptors_read_local_descriptor_node(
 	libpff_index_value_t *offset_index_value = NULL;
 	static char *function                    = "libpff_local_descriptors_read_local_descriptor_node";
 	off64_t cache_value_offset               = 0;
-	time_t cache_value_timestamp             = 0;
-	int cache_value_index                    = 0;
+	int64_t cache_value_timestamp            = 0;
 	int cache_value_file_index               = 0;
+	int cache_value_index                    = 0;
 	int is_cached                            = 0;
 
 	if( local_descriptors == NULL )
@@ -291,30 +291,6 @@ int libpff_local_descriptors_read_local_descriptor_node(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid local descriptors.",
-		 function );
-
-		return( -1 );
-	}
-	if( local_descriptors->io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid local descriptors - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( local_descriptors->io_handle->file_type != LIBPFF_FILE_TYPE_32BIT )
-	 && ( local_descriptors->io_handle->file_type != LIBPFF_FILE_TYPE_64BIT )
-	 && ( local_descriptors->io_handle->file_type != LIBPFF_FILE_TYPE_64BIT_4K_PAGE ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported file type.",
 		 function );
 
 		return( -1 );
@@ -472,7 +448,7 @@ int libpff_local_descriptors_read_local_descriptor_node(
 
 			return( -1 );
 		}
-		if( libpff_local_descriptor_node_read(
+		if( libpff_local_descriptor_node_read_file_io_handle(
 		     *local_descriptor_node,
 		     local_descriptors->io_handle,
 		     file_io_handle,

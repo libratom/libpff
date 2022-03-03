@@ -51,7 +51,6 @@ libpff_la_SOURCES = \
 	libpff_index_tree.c libpff_index_tree.h \
 	libpff_index_value.c libpff_index_value.h \
 	libpff_io_handle.c libpff_io_handle.h \
-	libpff_io_handle2.c libpff_io_handle2.h \
 	libpff_item.c libpff_item.h \
 	libpff_item_descriptor.c libpff_item_descriptor.h \
 	libpff_item_tree.c libpff_item_tree.h \
@@ -87,6 +86,7 @@ libpff_la_SOURCES = \
 	libpff_support.c libpff_support.h \
 	libpff_table.c libpff_table.h \
 	libpff_table_block_index.c libpff_table_block_index.h \
+	libpff_table_header.c libpff_table_header.h \
 	libpff_table_index_value.c libpff_table_index_value.h \
 	libpff_types.h \
 	libpff_unused.h \

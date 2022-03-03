@@ -1,7 +1,7 @@
 /*
  * Local descriptor node functions
  *
- * Copyright (C) 2008-2020, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2022, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -86,7 +86,14 @@ int libpff_local_descriptor_node_get_entry_sub_node_identifier(
      uint64_t *entry_sub_node_identifier,
      libcerror_error_t **error );
 
-int libpff_local_descriptor_node_read(
+int libpff_local_descriptor_node_read_data(
+     libpff_local_descriptor_node_t *local_descriptor_node,
+     libpff_io_handle_t *io_handle,
+     const uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error );
+
+int libpff_local_descriptor_node_read_file_io_handle(
      libpff_local_descriptor_node_t *local_descriptor_node,
      libpff_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
@@ -94,18 +101,6 @@ int libpff_local_descriptor_node_read(
      uint64_t data_identifier,
      off64_t node_offset,
      size32_t node_size,
-     libcerror_error_t **error );
-
-int libpff_local_descriptor_node_read_element_data(
-     libpff_io_handle_t *io_handle,
-     libbfio_handle_t *file_io_handle,
-     libfdata_list_element_t *list_element,
-     libfdata_cache_t *cache,
-     int data_range_file_index,
-     off64_t data_range_offset,
-     size64_t data_range_size,
-     uint32_t data_range_flags,
-     uint8_t read_flags,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

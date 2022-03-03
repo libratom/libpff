@@ -1,7 +1,7 @@
 /*
  * Python object wrapper of libpff_record_set_t
  *
- * Copyright (C) 2008-2020, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2022, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -228,7 +228,7 @@ on_error:
 	return( NULL );
 }
 
-/* Intializes a record set object
+/* Initializes a record set object
  * Returns 0 if successful or -1 on error
  */
 int pypff_record_set_init(

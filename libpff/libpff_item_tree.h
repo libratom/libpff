@@ -1,7 +1,7 @@
 /*
  * Item tree functions
  *
- * Copyright (C) 2008-2020, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2022, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -26,6 +26,7 @@
 #include <types.h>
 
 #include "libpff_descriptors_index.h"
+#include "libpff_index_tree.h"
 #include "libpff_libbfio.h"
 #include "libpff_libcdata.h"
 #include "libpff_libcerror.h"
@@ -61,6 +62,7 @@ int libpff_item_tree_get_tree_node_by_identifier(
      libcdata_tree_node_t *item_tree_node,
      uint32_t item_identifier,
      libcdata_tree_node_t **result_item_tree_node,
+     int recursion_depth,
      libcerror_error_t **error );
 
 int libpff_item_tree_get_sub_node_by_identifier(
@@ -88,7 +90,7 @@ int libpff_item_tree_create(
 int libpff_item_tree_create_node(
      libpff_item_tree_t *item_tree,
      libbfio_handle_t *file_io_handle,
-     libfdata_tree_t *descriptor_index_tree,
+     libpff_index_tree_t *descriptor_index_tree,
      libfdata_tree_node_t *descriptor_index_tree_node,
      libfcache_cache_t *index_tree_cache,
      libcdata_list_t *orphan_node_list,
@@ -99,7 +101,7 @@ int libpff_item_tree_create_node(
 int libpff_item_tree_create_leaf_node(
      libpff_item_tree_t *item_tree,
      libbfio_handle_t *file_io_handle,
-     libfdata_tree_t *descriptor_index_tree,
+     libpff_index_tree_t *descriptor_index_tree,
      libfdata_tree_node_t *descriptor_index_tree_node,
      libfcache_cache_t *index_tree_cache,
      libcdata_list_t *orphan_node_list,

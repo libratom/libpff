@@ -1,7 +1,7 @@
 /*
  * Python object wrapper of libpff_item_t
  *
- * Copyright (C) 2008-2020, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2022, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -283,7 +283,7 @@ on_error:
 	return( NULL );
 }
 
-/* Intializes an item object
+/* Initializes an item object
  * Returns 0 if successful or -1 on error
  */
 int pypff_item_init(

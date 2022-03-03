@@ -1,7 +1,7 @@
 /*
  * Data array functions
  *
- * Copyright (C) 2008-2020, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2022, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -303,6 +303,7 @@ int libpff_data_array_read_entries(
      uint8_t *array_data,
      size_t array_data_size,
      uint32_t *total_data_size,
+     int recursion_depth,
      libcerror_error_t **error )
 {
 	libpff_data_array_entry_t *data_array_entry = NULL;
@@ -388,6 +389,18 @@ int libpff_data_array_read_entries(
 
 		return( -1 );
 	}
+	if( ( recursion_depth < 0 )
+	 || ( recursion_depth > LIBPFF_MAXIMUM_DATA_ARRAY_RECURSION_DEPTH ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid recursion depth value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
@@ -444,7 +457,8 @@ int libpff_data_array_read_entries(
 		libcnotify_printf(
 		 "\n" );
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	if( array_entries_level == 0 )
 	{
 		libcerror_error_set(
@@ -749,6 +763,7 @@ int libpff_data_array_read_entries(
 			     data_block->data,
 			     data_block->data_size,
 			     &sub_total_data_size,
+			     recursion_depth + 1,
 			     error ) != 1 )
 			{
 				libcerror_error_set(

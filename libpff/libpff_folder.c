@@ -1,7 +1,7 @@
 /*
  * Folder functions
  *
- * Copyright (C) 2008-2020, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2022, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -40,7 +40,6 @@
 #include "libpff_libfdata.h"
 #include "libpff_libfmapi.h"
 #include "libpff_local_descriptor_value.h"
-#include "libpff_local_descriptors_tree.h"
 #include "libpff_mapi.h"
 #include "libpff_record_entry.h"
 

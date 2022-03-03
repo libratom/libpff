@@ -1,7 +1,7 @@
 /*
  * File header functions
  *
- * Copyright (C) 2008-2020, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2022, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -24,6 +24,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include "libpff_debug.h"
 #include "libpff_definitions.h"
 #include "libpff_file_header.h"
 #include "libpff_io_handle.h"
@@ -145,20 +146,22 @@ int libpff_file_header_read_data(
      size_t data_size,
      libcerror_error_t **error )
 {
-	const uint8_t *file_header_data = NULL;
-	static char *function           = "libpff_file_header_read_data";
-	uint32_t calculated_checksum    = 0;
-	uint32_t stored_checksum        = 0;
-	uint16_t content_type           = 0;
-	uint16_t data_version           = 0;
+	const uint8_t *file_header_data                  = NULL;
+	static char *function                            = "libpff_file_header_read_data";
+	uint64_t safe_descriptors_index_root_node_offset = 0;
+	uint64_t safe_offsets_index_root_node_offset     = 0;
+	uint32_t calculated_checksum                     = 0;
+	uint32_t stored_checksum                         = 0;
+	uint16_t content_type                            = 0;
+	uint16_t data_version                            = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	const uint8_t *value_data       = 0;
-	uint64_t value_64bit            = 0;
-	uint32_t value_32bit            = 0;
-	uint16_t value_16bit            = 0;
-	uint8_t sentinal                = 0;
-	int value_iterator              = 0;
+	const uint8_t *value_data                        = 0;
+	uint64_t value_64bit                             = 0;
+	uint32_t value_32bit                             = 0;
+	uint16_t value_16bit                             = 0;
+	uint8_t sentinel                                 = 0;
+	int value_iterator                               = 0;
 #endif
 
 	if( file_header == NULL )
@@ -273,8 +276,8 @@ int libpff_file_header_read_data(
 	}
 	else
 	{
-		if( ( ( (pff_file_header_data_32bit_t *) file_header_data )->sentinal == 0x80 )
-		 && ( ( (pff_file_header_data_64bit_t *) file_header_data )->sentinal != 0x80 ) )
+		if( ( ( (pff_file_header_data_32bit_t *) file_header_data )->sentinel == 0x80 )
+		 && ( ( (pff_file_header_data_64bit_t *) file_header_data )->sentinel != 0x80 ) )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libcnotify_verbose != 0 )
@@ -287,8 +290,8 @@ int libpff_file_header_read_data(
 #endif
 			file_header->file_type = LIBPFF_FILE_TYPE_32BIT;
 		}
-		else if( ( ( (pff_file_header_data_32bit_t *) file_header_data )->sentinal != 0x80 )
-		      && ( ( (pff_file_header_data_64bit_t *) file_header_data )->sentinal == 0x80 ) )
+		else if( ( ( (pff_file_header_data_32bit_t *) file_header_data )->sentinel != 0x80 )
+		      && ( ( (pff_file_header_data_64bit_t *) file_header_data )->sentinel == 0x80 ) )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libcnotify_verbose != 0 )
@@ -459,7 +462,7 @@ int libpff_file_header_read_data(
 
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (pff_file_header_data_32bit_t *) file_header_data )->descriptors_index_root_node_offset,
-		 file_header->descriptors_index_root_node_offset );
+		 safe_descriptors_index_root_node_offset );
 
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (pff_file_header_data_32bit_t *) file_header_data )->offsets_index_back_pointer,
@@ -467,10 +470,10 @@ int libpff_file_header_read_data(
 
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (pff_file_header_data_32bit_t *) file_header_data )->offsets_index_root_node_offset,
-		 file_header->offsets_index_root_node_offset );
+		 safe_offsets_index_root_node_offset );
 
 #if defined( HAVE_DEBUG_OUTPUT )
-		sentinal = ( (pff_file_header_data_32bit_t *) file_header_data )->sentinal;
+		sentinel = ( (pff_file_header_data_32bit_t *) file_header_data )->sentinel;
 #endif
 		file_header->encryption_type = ( (pff_file_header_data_32bit_t *) file_header_data )->encryption_type;
 	}
@@ -487,7 +490,7 @@ int libpff_file_header_read_data(
 
 		byte_stream_copy_to_uint64_little_endian(
 		 ( (pff_file_header_data_64bit_t *) file_header_data )->descriptors_index_root_node_offset,
-		 file_header->descriptors_index_root_node_offset );
+		 safe_descriptors_index_root_node_offset );
 
 		byte_stream_copy_to_uint64_little_endian(
 		 ( (pff_file_header_data_64bit_t *) file_header_data )->offsets_index_back_pointer,
@@ -495,10 +498,10 @@ int libpff_file_header_read_data(
 
 		byte_stream_copy_to_uint64_little_endian(
 		 ( (pff_file_header_data_64bit_t *) file_header_data )->offsets_index_root_node_offset,
-		 file_header->offsets_index_root_node_offset );
+		 safe_offsets_index_root_node_offset );
 
 #if defined( HAVE_DEBUG_OUTPUT )
-		sentinal = ( (pff_file_header_data_64bit_t *) file_header_data )->sentinal;
+		sentinel = ( (pff_file_header_data_64bit_t *) file_header_data )->sentinel;
 #endif
 		file_header->encryption_type = ( (pff_file_header_data_64bit_t *) file_header_data )->encryption_type;
 
@@ -698,9 +701,9 @@ int libpff_file_header_read_data(
 		 file_header->descriptors_index_root_node_back_pointer );
 
 		libcnotify_printf(
-		 "%s: descriptors index root node offset\t: %" PRIi64 "\n",
+		 "%s: descriptors index root node offset\t: %" PRIu64 " (0x%08" PRIx64 ")\n",
 		 function,
-		 file_header->descriptors_index_root_node_offset );
+		 safe_descriptors_index_root_node_offset );
 
 		libcnotify_printf(
 		 "%s: offsets index back pointer\t\t: %" PRIu64 "\n",
@@ -708,9 +711,10 @@ int libpff_file_header_read_data(
 		 file_header->offsets_index_root_node_back_pointer );
 
 		libcnotify_printf(
-		 "%s: offsets index root node offset\t\t: %" PRIi64 "\n",
+		 "%s: offsets index root node offset\t\t: %" PRIu64 " (0x%08" PRIx64 ")\n",
 		 function,
-		 file_header->offsets_index_root_node_offset );
+		 safe_offsets_index_root_node_offset,
+		 safe_offsets_index_root_node_offset );
 
 		if( file_header->file_type == LIBPFF_FILE_TYPE_32BIT )
 		{
@@ -784,14 +788,16 @@ int libpff_file_header_read_data(
 			 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 		}
 		libcnotify_printf(
-		 "%s: sentinal\t\t\t\t\t: 0x%02" PRIx8 "\n",
+		 "%s: sentinel\t\t\t\t\t: 0x%02" PRIx8 "\n",
 		 function,
-		 sentinal );
+		 sentinel );
 
 		libcnotify_printf(
-		 "%s: encryption type\t\t\t\t: 0x%02" PRIx8 "\n",
+		 "%s: encryption type\t\t\t\t: 0x%02" PRIx8 " (%s)\n",
 		 function,
-		 file_header->encryption_type );
+		 file_header->encryption_type,
+		 libpff_debug_get_encryption_type(
+		  file_header->encryption_type ) );
 
 		if( file_header->file_type == LIBPFF_FILE_TYPE_32BIT )
 		{
@@ -894,6 +900,32 @@ int libpff_file_header_read_data(
 	}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
+	if( safe_descriptors_index_root_node_offset > (uint64_t) INT64_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid descriptors index root node offset value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( safe_offsets_index_root_node_offset > (uint64_t) INT64_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid offsets index root node offset value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+
+	file_header->descriptors_index_root_node_offset = (off64_t) safe_descriptors_index_root_node_offset;
+	file_header->offsets_index_root_node_offset     = (off64_t) safe_offsets_index_root_node_offset;
+
 	if( ( file_header->file_type == LIBPFF_FILE_TYPE_64BIT )
 	 || ( file_header->file_type == LIBPFF_FILE_TYPE_64BIT_4K_PAGE ) )
 	{
@@ -963,25 +995,11 @@ int libpff_file_header_read_file_io_handle(
 		 function );
 	}
 #endif
-	if( libbfio_handle_seek_offset(
-	     file_io_handle,
-	     0,
-	     SEEK_SET,
-	     error ) == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek file header offset: 0.",
-		 function );
-
-		return( -1 );
-	}
-	read_count = libbfio_handle_read_buffer(
+	read_count = libbfio_handle_read_buffer_at_offset(
 	              file_io_handle,
 	              file_header_data,
 	              read_size,
+	              0,
 	              error );
 
 	if( read_count != (ssize_t) read_size )
@@ -990,7 +1008,7 @@ int libpff_file_header_read_file_io_handle(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read file header data.",
+		 "%s: unable to read file header data at offset: 0 (0x00000000).",
 		 function );
 
 		return( -1 );

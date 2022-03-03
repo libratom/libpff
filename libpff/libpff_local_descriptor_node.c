@@ -1,7 +1,7 @@
 /*
  * Local descriptor node functions
  *
- * Copyright (C) 2008-2020, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2022, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -30,9 +30,7 @@
 #include "libpff_libbfio.h"
 #include "libpff_libcerror.h"
 #include "libpff_libcnotify.h"
-#include "libpff_libfmapi.h"
 #include "libpff_local_descriptor_node.h"
-#include "libpff_unused.h"
 
 #include "pff_local_descriptor_node.h"
 
@@ -411,22 +409,18 @@ int libpff_local_descriptor_node_get_entry_sub_node_identifier(
 	return( 1 );
 }
 
-/* Reads an local descriptor node
+/* Reads a local descriptor node
  * Returns 1 if successful or -1 on error
  */
-int libpff_local_descriptor_node_read(
+int libpff_local_descriptor_node_read_data(
      libpff_local_descriptor_node_t *local_descriptor_node,
      libpff_io_handle_t *io_handle,
-     libbfio_handle_t *file_io_handle,
-     uint32_t descriptor_identifier,
-     uint64_t data_identifier,
-     off64_t node_offset,
-     size32_t node_size,
+     const uint8_t *data,
+     size_t data_size,
      libcerror_error_t **error )
 {
-	libpff_data_block_t *data_block           = NULL;
-	static char *function                     = "libpff_local_descriptor_node_read";
-	size_t local_descriptor_node_header_size  = 0;
+	static char *function                     = "libpff_local_descriptor_node_read_data";
+	size_t header_data_size                   = 0;
 	uint8_t node_signature                    = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -468,9 +462,16 @@ int libpff_local_descriptor_node_read(
 
 		return( -1 );
 	}
-	if( ( io_handle->file_type != LIBPFF_FILE_TYPE_32BIT )
-	 && ( io_handle->file_type != LIBPFF_FILE_TYPE_64BIT )
-	 && ( io_handle->file_type != LIBPFF_FILE_TYPE_64BIT_4K_PAGE ) )
+	if( io_handle->file_type == LIBPFF_FILE_TYPE_32BIT )
+	{
+		header_data_size = sizeof( pff_local_descriptor_node_32bit_t );
+	}
+	else if( ( io_handle->file_type == LIBPFF_FILE_TYPE_64BIT )
+	      || ( io_handle->file_type == LIBPFF_FILE_TYPE_64BIT_4K_PAGE ) )
+	{
+		header_data_size = sizeof( pff_local_descriptor_node_64bit_t );
+	}
+	else
 	{
 		libcerror_error_set(
 		 error,
@@ -481,72 +482,28 @@ int libpff_local_descriptor_node_read(
 
 		return( -1 );
 	}
-	if( node_offset < 0 )
+	if( data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( data_size < header_data_size )
+	 || ( data_size > SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid node offset value out of bounds.",
+		 "%s: unsupported data size value out of bounds.",
 		 function );
 
 		return( -1 );
-	}
-	if( node_size > (size32_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: node size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( libpff_data_block_initialize(
-	     &data_block,
-	     io_handle,
-	     descriptor_identifier,
-	     data_identifier,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create data block.",
-		 function );
-
-		goto on_error;
-	}
-	if( libpff_data_block_read_file_io_handle(
-	     data_block,
-	     file_io_handle,
-	     node_offset,
-	     node_size,
-	     io_handle->file_type,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read data block at offset: %" PRIi64 ".",
-		 function,
-		 node_offset );
-
-		goto on_error;
-	}
-	if( data_block->data == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid data block - missing data.",
-		 function );
-
-		goto on_error;
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -555,30 +512,28 @@ int libpff_local_descriptor_node_read(
 		 "%s: local descriptor node data:\n",
 		 function );
 		libcnotify_print_data(
-		 data_block->data,
-		 data_block->uncompressed_data_size,
+		 data,
+		 data_size,
 		 0 );
 	}
 #endif
-	/* Parse the local descriptors node data
-	 */
 	if( io_handle->file_type == LIBPFF_FILE_TYPE_32BIT )
 	{
-		node_signature               = ( (pff_local_descriptor_node_32bit_t *) data_block->data )->signature;
-		local_descriptor_node->level = ( (pff_local_descriptor_node_32bit_t *) data_block->data )->level;
+		node_signature               = ( (pff_local_descriptor_node_32bit_t *) data )->signature;
+		local_descriptor_node->level = ( (pff_local_descriptor_node_32bit_t *) data )->level;
 
 		byte_stream_copy_to_uint16_little_endian(
-		 ( (pff_local_descriptor_node_32bit_t *) data_block->data )->number_of_entries,
+		 ( (pff_local_descriptor_node_32bit_t *) data )->number_of_entries,
 		 local_descriptor_node->number_of_entries );
 	}
 	else if( ( io_handle->file_type == LIBPFF_FILE_TYPE_64BIT )
 	      || ( io_handle->file_type == LIBPFF_FILE_TYPE_64BIT_4K_PAGE ) )
 	{
-		node_signature               = ( (pff_local_descriptor_node_64bit_t *) data_block->data )->signature;
-		local_descriptor_node->level = ( (pff_local_descriptor_node_64bit_t *) data_block->data )->level;
+		node_signature               = ( (pff_local_descriptor_node_64bit_t *) data )->signature;
+		local_descriptor_node->level = ( (pff_local_descriptor_node_64bit_t *) data )->level;
 
 		byte_stream_copy_to_uint16_little_endian(
-		 ( (pff_local_descriptor_node_64bit_t *) data_block->data )->number_of_entries,
+		 ( (pff_local_descriptor_node_64bit_t *) data )->number_of_entries,
 		 local_descriptor_node->number_of_entries );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -588,10 +543,12 @@ int libpff_local_descriptor_node_read(
 		 "%s: local descriptors node signature\t\t: 0x%02" PRIx8 "\n",
 		 function,
 		 node_signature );
+
 		libcnotify_printf(
 		 "%s: local descriptors node level\t\t\t: %" PRIu8 "\n",
 		 function,
 		 local_descriptor_node->level );
+
 		libcnotify_printf(
 		 "%s: number of entries\t\t\t\t: %" PRIu16 "\n",
 		 function,
@@ -604,12 +561,13 @@ int libpff_local_descriptor_node_read(
 			 "%s: padding1:\n",
 			 function );
 			libcnotify_print_data(
-			 ( (pff_local_descriptor_node_64bit_t *) data_block->data )->padding1,
+			 ( (pff_local_descriptor_node_64bit_t *) data )->padding1,
 			 4,
 			 0 );
 		}
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	if( node_signature != 0x02 )
 	{
 		libcerror_error_set(
@@ -624,8 +582,6 @@ int libpff_local_descriptor_node_read(
 	}
 	if( io_handle->file_type == LIBPFF_FILE_TYPE_32BIT )
 	{
-		local_descriptor_node_header_size = sizeof( pff_local_descriptor_node_32bit_t );
-
 		if( local_descriptor_node->level == LIBPFF_LOCAL_DESCRIPTOR_NODE_LEVEL_LEAF )
 		{
 			local_descriptor_node->entry_size = sizeof( pff_local_descriptor_leaf_node_entry_type_32bit_t );
@@ -638,8 +594,6 @@ int libpff_local_descriptor_node_read(
 	else if( ( io_handle->file_type == LIBPFF_FILE_TYPE_64BIT )
 	      || ( io_handle->file_type == LIBPFF_FILE_TYPE_64BIT_4K_PAGE ) )
 	{
-		local_descriptor_node_header_size = sizeof( pff_local_descriptor_node_64bit_t );
-
 		if( local_descriptor_node->level == LIBPFF_LOCAL_DESCRIPTOR_NODE_LEVEL_LEAF )
 		{
 			local_descriptor_node->entry_size = sizeof( pff_local_descriptor_leaf_node_entry_type_64bit_t );
@@ -665,7 +619,7 @@ int libpff_local_descriptor_node_read(
 	}
 	local_descriptor_node->entries_data_size = local_descriptor_node->number_of_entries * local_descriptor_node->entry_size;
 
-	if( local_descriptor_node->entries_data_size != ( data_block->uncompressed_data_size - local_descriptor_node_header_size ) )
+	if( local_descriptor_node->entries_data_size != ( data_size - header_data_size ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -707,7 +661,7 @@ int libpff_local_descriptor_node_read(
 	}
 	if( memory_copy(
 	     local_descriptor_node->entries_data,
-	     &( data_block->data[ local_descriptor_node_header_size ] ),
+	     &( data[ header_data_size ] ),
 	     local_descriptor_node->entries_data_size ) == NULL )
 	{
 		libcerror_error_set(
@@ -817,7 +771,123 @@ int libpff_local_descriptor_node_read(
 		libcnotify_printf(
 		 "\n" );
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
+	return( 1 );
+
+on_error:
+	if( local_descriptor_node->entries_data != NULL )
+	{
+		memory_free(
+		 local_descriptor_node->entries_data );
+
+		local_descriptor_node->entries_data = NULL;
+	}
+	local_descriptor_node->entries_data_size = 0;
+
+	return( -1 );
+}
+
+/* Reads a local descriptor node
+ * Returns 1 if successful or -1 on error
+ */
+int libpff_local_descriptor_node_read_file_io_handle(
+     libpff_local_descriptor_node_t *local_descriptor_node,
+     libpff_io_handle_t *io_handle,
+     libbfio_handle_t *file_io_handle,
+     uint32_t descriptor_identifier,
+     uint64_t data_identifier,
+     off64_t node_offset,
+     size32_t node_size,
+     libcerror_error_t **error )
+{
+	libpff_data_block_t *data_block = NULL;
+	static char *function           = "libpff_local_descriptor_node_read_file_io_handle";
+
+	if( local_descriptor_node == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid local descriptor node.",
+		 function );
+
+		return( -1 );
+	}
+	if( node_offset < 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid node offset value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( node_size > (size32_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: node size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( libpff_data_block_initialize(
+	     &data_block,
+	     io_handle,
+	     descriptor_identifier,
+	     data_identifier,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create data block.",
+		 function );
+
+		goto on_error;
+	}
+	if( libpff_data_block_read_file_io_handle(
+	     data_block,
+	     file_io_handle,
+	     node_offset,
+	     node_size,
+	     io_handle->file_type,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read data block at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+		 function,
+		 node_offset,
+		 node_offset );
+
+		goto on_error;
+	}
+	if( libpff_local_descriptor_node_read_data(
+	     local_descriptor_node,
+	     io_handle,
+	     data_block->data,
+	     data_block->uncompressed_data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read local descriptor node.",
+		 function );
+
+		goto on_error;
+	}
 	if( libpff_data_block_free(
 	     &data_block,
 	     error ) != 1 )
@@ -847,114 +917,6 @@ on_error:
 	{
 		libpff_data_block_free(
 		 &data_block,
-		 NULL );
-	}
-	return( -1 );
-}
-
-/* Reads a local descriptor node
- * Callback for the local descriptor nodes list
- * Returns 1 if successful or -1 on error
- */
-int libpff_local_descriptor_node_read_element_data(
-     libpff_io_handle_t *io_handle,
-     libbfio_handle_t *file_io_handle,
-     libfdata_list_element_t *list_element,
-     libfdata_cache_t *cache,
-     int data_range_file_index LIBPFF_ATTRIBUTE_UNUSED,
-     off64_t data_range_offset,
-     size64_t data_range_size,
-     uint32_t data_range_flags LIBPFF_ATTRIBUTE_UNUSED,
-     uint8_t read_flags LIBPFF_ATTRIBUTE_UNUSED,
-     libcerror_error_t **error )
-{
-	libpff_local_descriptor_node_t *local_descriptor_node = NULL;
-	static char *function                                 = "libpff_local_descriptor_node_read_element_data";
-
-	LIBPFF_UNREFERENCED_PARAMETER( data_range_file_index )
-	LIBPFF_UNREFERENCED_PARAMETER( data_range_flags )
-	LIBPFF_UNREFERENCED_PARAMETER( read_flags )
-
-	if( io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_range_size > (size64_t) UINT32_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: data range size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( libpff_local_descriptor_node_initialize(
-	     &local_descriptor_node,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create local descriptor node.",
-		 function );
-
-		goto on_error;
-	}
-	if( libpff_local_descriptor_node_read(
-	     local_descriptor_node,
-	     io_handle,
-	     file_io_handle,
-	     0,
-	     0,
-	     data_range_offset,
-	     (size32_t) data_range_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read local descriptor node at offset: 0x%08" PRIx64 ".",
-		 function,
-		 data_range_offset );
-
-		goto on_error;
-	}
-	if( libfdata_list_element_set_element_value(
-	     list_element,
-	     (intptr_t *) file_io_handle,
-	     cache,
-	     (intptr_t *) local_descriptor_node,
-	     (int (*)(intptr_t **, libcerror_error_t **)) &libpff_local_descriptor_node_free,
-	     LIBFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set local descriptor node as element value.",
-		 function );
-
-		goto on_error;
-	}
-	return( 1 );
-
-on_error:
-	if( local_descriptor_node != NULL )
-	{
-		libpff_local_descriptor_node_free(
-		 &local_descriptor_node,
 		 NULL );
 	}
 	return( -1 );

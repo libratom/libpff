@@ -1,7 +1,7 @@
 /*
  * Recover functions
  *
- * Copyright (C) 2008-2020, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2022, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -198,12 +198,11 @@ int libpff_recover_items(
 	/* For the recovered descriptor index nodes check
 	 * if the local descriptor and data offset index value still exists
 	 */
-	if( libfdata_tree_get_number_of_leaf_nodes(
+	if( libpff_index_tree_get_number_of_leaf_nodes(
 	     descriptors_index->recovered_index_tree,
-	     (intptr_t *) file_io_handle,
+	     file_io_handle,
 	     (libfdata_cache_t *) descriptors_index->index_cache,
 	     &number_of_recovered_descriptor_index_values,
-	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -223,13 +222,12 @@ int libpff_recover_items(
 		{
 			goto on_error;
 		}
-		if( libfdata_tree_get_leaf_node_by_index(
+		if( libpff_index_tree_get_leaf_node_by_index(
 		     descriptors_index->recovered_index_tree,
-		     (intptr_t *) file_io_handle,
+		     file_io_handle,
 		     (libfdata_cache_t *) descriptors_index->index_cache,
 		     recovered_descriptor_index_value_iterator,
 		     &recovered_descriptor_index_leaf_node,
-		     0,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -340,32 +338,6 @@ int libpff_recover_items(
 				{
 					/* Check if the data block is readable
 					 */
-#if defined( HAVE_DEBUG_OUTPUT )
-					if( libcnotify_verbose != 0 )
-					{
-						libcnotify_printf(
-						 "%s: reading data block at offset: %" PRIi64 " (0x%08" PRIx64 ")\n",
-						 function,
-						 offset_index_value->file_offset,
-						 offset_index_value->file_offset );
-					}
-#endif
-					if( libbfio_handle_seek_offset(
-					     file_io_handle,
-					     offset_index_value->file_offset,
-					     SEEK_SET,
-					     error ) == -1 )
-					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_IO,
-						 LIBCERROR_IO_ERROR_SEEK_FAILED,
-						 "%s: unable to seek data block offset: %" PRIi64 ".",
-						 function,
-						 offset_index_value->file_offset );
-
-						goto on_error;
-					}
 					if( libpff_data_block_initialize(
 					     &recovered_data_block,
 					     io_handle,
@@ -382,6 +354,16 @@ int libpff_recover_items(
 
 						goto on_error;
 					}
+#if defined( HAVE_DEBUG_OUTPUT )
+					if( libcnotify_verbose != 0 )
+					{
+						libcnotify_printf(
+						 "%s: attempting to read data block at offset: %" PRIi64 " (0x%08" PRIx64 ")\n",
+						 function,
+						 offset_index_value->file_offset,
+						 offset_index_value->file_offset );
+					}
+#endif
 					result = libpff_data_block_read_file_io_handle(
 					          recovered_data_block,
 					          file_io_handle,
@@ -795,12 +777,11 @@ int libpff_recover_index_nodes(
 #endif
 	/* Scan the existing descriptor index nodes for remnant values
 	 */
-	if( libfdata_tree_get_number_of_deleted_leaf_nodes(
+	if( libpff_index_tree_get_number_of_deleted_leaf_nodes(
 	     descriptors_index->index_tree,
-	     (intptr_t *) file_io_handle,
+	     file_io_handle,
 	     (libfdata_cache_t *) descriptors_index->index_cache,
 	     &number_of_deleted_index_values,
-	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -820,13 +801,12 @@ int libpff_recover_index_nodes(
 		{
 			return( -1 );
 		}
-		if( libfdata_tree_get_deleted_leaf_node_by_index(
+		if( libpff_index_tree_get_deleted_leaf_node_by_index(
 		     descriptors_index->index_tree,
-		     (intptr_t *) file_io_handle,
+		     file_io_handle,
 		     (libfdata_cache_t *) descriptors_index->index_cache,
 		     deleted_index_value_iterator,
 		     &deleted_index_leaf_node,
-		     0,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -1046,12 +1026,11 @@ int libpff_recover_index_nodes(
 #ifdef TODO
 	/* Scan the existing offset index nodes for remnant values
 	 */
-	if( libfdata_tree_get_number_of_deleted_leaf_nodes(
+	if( libpff_index_tree_get_number_of_deleted_leaf_nodes(
 	     offsets_index->index_tree,
-	     (intptr_t *) file_io_handle,
+	     file_io_handle,
 	     (libfdata_cache_t *) offsets_index->index_cache,
 	     &number_of_deleted_index_values,
-	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1071,13 +1050,12 @@ int libpff_recover_index_nodes(
 		{
 			return( -1 );
 		}
-		if( libfdata_tree_get_deleted_leaf_node_by_index(
+		if( libpff_index_tree_get_deleted_leaf_node_by_index(
 		     offsets_index->index_tree,
-		     (intptr_t *) file_io_handle,
+		     file_io_handle,
 		     (libfdata_cache_t *) offsets_index->index_cache,
 		     deleted_index_value_iterator,
 		     &deleted_index_leaf_node,
-		     0,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -1698,26 +1676,11 @@ int libpff_recover_data_blocks(
 						 read_size );
 					}
 #endif
-					if( libbfio_handle_seek_offset(
-					     file_io_handle,
-					     block_buffer_data_offset,
-					     SEEK_SET,
-					     error ) == -1 )
-					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_IO,
-						 LIBCERROR_IO_ERROR_SEEK_FAILED,
-						 "%s: unable to seek data block offset: %" PRIi64 ".",
-						 function,
-						 block_buffer_data_offset );
-
-						goto on_error;
-					}
-					read_count = libbfio_handle_read_buffer(
+					read_count = libbfio_handle_read_buffer_at_offset(
 						      file_io_handle,
 						      &( block_buffer[ block_buffer_offset ] ),
 						      read_size,
+						      block_buffer_data_offset,
 						      error );
 
 					if( read_count != (ssize_t) read_size )
@@ -1726,8 +1689,10 @@ int libpff_recover_data_blocks(
 						 error,
 						 LIBCERROR_ERROR_DOMAIN_IO,
 						 LIBCERROR_IO_ERROR_READ_FAILED,
-						 "%s: unable to read data block.",
-						 function );
+						 "%s: unable to read data block at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+						 function,
+						 block_buffer_data_offset,
+						 block_buffer_data_offset );
 
 						goto on_error;
 					}
@@ -2697,7 +2662,7 @@ int libpff_recover_local_descriptors(
 
 		return( -1 );
 	}
-	if( libpff_local_descriptor_node_read(
+	if( libpff_local_descriptor_node_read_file_io_handle(
 	     local_descriptor_node,
 	     io_handle,
 	     file_io_handle,
