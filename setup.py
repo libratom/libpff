@@ -26,8 +26,8 @@ from setuptools.command.build_ext import build_ext
 from setuptools.command.sdist import sdist
 
 
-if (sys.version_info[0], sys.version_info[1]) < (3, 7):
-  print(("Unsupported Python version: {0:s}, version 3.7 or higher "
+if (sys.version_info[0], sys.version_info[1]) < (3, 10):
+  print(("Unsupported Python version: {0:s}, version 3.10 or higher "
          "required.").format(sys.version))
   sys.exit(1)
 
