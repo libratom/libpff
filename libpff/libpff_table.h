@@ -1,7 +1,7 @@
 /*
  * Table functions
  *
- * Copyright (C) 2008-2022, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2024, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -89,9 +89,9 @@ struct libpff_table
 	 */
 	libpff_local_descriptors_tree_t *local_descriptors_tree;
 
-	/* The local descriptors cache
+	/* The local descriptor values cache
 	 */
-	libfcache_cache_t *local_descriptors_cache;
+	libfcache_cache_t *local_descriptor_values_cache;
 
 	/* The values array data list
 	 */
@@ -312,6 +312,7 @@ int libpff_table_read_record_entries(
      uint32_t record_entries_reference,
      libpff_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
+     int recursion_depth,
      libcerror_error_t **error );
 
 int libpff_table_read_values(

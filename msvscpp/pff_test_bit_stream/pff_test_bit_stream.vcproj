@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="pff_test_local_descriptor_node"
-	ProjectGUID="{58B898C4-F3D5-44E7-BAA9-E28664C8A014}"
-	RootNamespace="pff_test_local_descriptor_node"
+	Name="pff_test_bit_stream"
+	ProjectGUID="{6855865B-DA24-4CD9-8E65-5D5358F2CB79}"
+	RootNamespace="pff_test_bit_stream"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,11 +176,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\pff_test_functions.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\pff_test_local_descriptor_node.c"
+				RelativePath="..\..\tests\pff_test_bit_stream.c"
 				>
 			</File>
 			<File
@@ -193,14 +189,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath="..\..\tests\pff_test_functions.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\pff_test_libbfio.h"
-				>
-			</File>
 			<File
 				RelativePath="..\..\tests\pff_test_libcerror.h"
 				>

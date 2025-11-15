@@ -1,7 +1,7 @@
 /*
  * Data array functions
  *
- * Copyright (C) 2008-2022, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2024, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -29,6 +29,7 @@
 #include "libpff_libbfio.h"
 #include "libpff_libcdata.h"
 #include "libpff_libcerror.h"
+#include "libpff_libfcache.h"
 #include "libpff_libfdata.h"
 #include "libpff_offsets_index.h"
 

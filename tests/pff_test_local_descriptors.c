@@ -1,7 +1,7 @@
 /*
  * Library local_descriptors type test program
  *
- * Copyright (C) 2008-2022, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2024, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -78,9 +78,8 @@ int pff_test_local_descriptors_initialize(
 
 	result = libpff_offsets_index_initialize(
 	          &offsets_index,
-	          io_handle,
-	          NULL,
-	          NULL,
+	          0,
+	          0,
 	          &error );
 
 	PFF_TEST_ASSERT_EQUAL_INT(

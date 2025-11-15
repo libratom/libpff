@@ -1,7 +1,7 @@
 /*
  * Item functions
  *
- * Copyright (C) 2008-2022, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2024, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -1976,6 +1976,19 @@ int libpff_internal_item_get_embedded_object_data(
 
 		goto on_error;
 	}
+	if( libpff_local_descriptor_value_free(
+	     &local_descriptor_value,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free local descriptor values.",
+		 function );
+
+		goto on_error;
+	}
 	return( 1 );
 
 on_error:
@@ -1989,6 +2002,12 @@ on_error:
 	{
 		libfdata_list_free(
 		 &embedded_object_data_list,
+		 NULL );
+	}
+	if( local_descriptor_value != NULL )
+	{
+		libpff_local_descriptor_value_free(
+		 &local_descriptor_value,
 		 NULL );
 	}
 	return( -1 );

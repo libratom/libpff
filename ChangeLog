@@ -1,7 +1,13 @@
 TODO
 libpff - clean up and refactoring
-* remove libfdata_tree
-** replace libpff_local_descriptors_read_local_descriptor_node by libpff_local_descriptors_tree_read_node
+
+* refactor
+** merge descriptors_index_tree and offsets_index_tree into index_tree?
+** recover refactor libpff_recover_index_nodes to use index_node
+** cache index nodes and/or index values
+** cache local descriptors nodes and/or local descriptor values
+** use or remove table->local_descriptors_cache
+
 * libpff_table
   - move table header read functions into table header source file
   - move column definition read functions into column definition source file

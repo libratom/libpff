@@ -1,7 +1,7 @@
 /*
  * Library table type test program
  *
- * Copyright (C) 2008-2022, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2024, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -1382,7 +1382,7 @@ int pff_test_table_read(
 	libcerror_error_free(
 	 &error );
 
-	table->local_descriptors_cache = (libfcache_cache_t *) 0x12345678UL;
+	table->local_descriptor_values_cache = (libfcache_cache_t *) 0x12345678UL;
 
 	result = libpff_table_read(
 	          table,
@@ -1393,7 +1393,7 @@ int pff_test_table_read(
 	          0,
 	          &error );
 
-	table->local_descriptors_cache = NULL;
+	table->local_descriptor_values_cache = NULL;
 
 	PFF_TEST_ASSERT_EQUAL_INT(
 	 "result",

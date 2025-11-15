@@ -1,7 +1,7 @@
 /*
  * Data array functions
  *
- * Copyright (C) 2008-2022, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2008-2024, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -34,6 +34,7 @@
 #include "libpff_libcdata.h"
 #include "libpff_libcerror.h"
 #include "libpff_libcnotify.h"
+#include "libpff_libfcache.h"
 #include "libpff_libfdata.h"
 #include "libpff_unused.h"
 
@@ -563,6 +564,7 @@ int libpff_data_array_read_entries(
 /* TODO handle multiple recovered offset index values */
 		if( libpff_offsets_index_get_index_value_by_identifier(
 		     offsets_index,
+		     io_handle,
 		     file_io_handle,
 		     array_entry_identifier,
 		     recovered,
@@ -790,6 +792,19 @@ int libpff_data_array_read_entries(
 
 			goto on_error;
 		}
+		if( libpff_index_value_free(
+		     &offset_index_value,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free offsets index value.",
+			 function );
+
+			goto on_error;
+		}
 		element_index++;
 	}
 	if( *total_data_size != calculated_total_data_size )
@@ -818,6 +833,12 @@ on_error:
 	{
 		libpff_data_array_entry_free(
 		 &data_array_entry,
+		 NULL );
+	}
+	if( offset_index_value != NULL )
+	{
+		libpff_index_value_free(
+		 &offset_index_value,
 		 NULL );
 	}
 	return( -1 );
