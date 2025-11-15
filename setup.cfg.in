@@ -1,8 +1,8 @@
 [metadata]
-name = libpff-python
+name = libpff-python-ratom
 version = @VERSION@
 description = Python bindings module for libpff
-long_description = Python bindings module for libpff
+long_description = Built from the libratom fork of libpff for the RATOM project
 long_description_content_type = text/plain
 author = Joachim Metz
 author_email = joachim.metz@gmail.com
